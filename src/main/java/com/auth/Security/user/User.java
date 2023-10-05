@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,7 +19,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user")
+@Table(
+        name = "_user",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "user_email_unique",columnNames = "email")
+        }
+)
 public class User implements UserDetails {
     @Id
     @SequenceGenerator(
@@ -33,12 +39,25 @@ public class User implements UserDetails {
     private Integer id;
     private  String last_name;
     private  String first_name;
+    @Column(
+            name = "email",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
     private  String email;
     private  String password;
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    @Column(
+            name = "created_at",
+            nullable = false,
+            columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
+    )
+    private LocalDateTime created_at;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

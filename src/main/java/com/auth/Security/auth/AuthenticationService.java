@@ -43,6 +43,8 @@ public class AuthenticationService {
                             .last_name(responses.get(i).getLast_name())
                             .email(responses.get(i).getEmail())
                             .role(responses.get(i).getRole())
+                            .gender(responses.get(i).getGender())
+                            .created_at(responses.get(i).getCreated_at())
                             .build()
             );
         }
@@ -65,6 +67,8 @@ public class AuthenticationService {
                 .email((request.getEmail()))
                 .password(passwordEncoder.encode((request.getPassword())))
                 .role(request.getRole())
+                .gender(request.getGender())
+                .created_at(request.getCreated_at())
                 .build();
 
         var savedUser = repository.save(user);
