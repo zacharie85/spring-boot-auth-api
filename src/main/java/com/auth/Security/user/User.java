@@ -1,6 +1,7 @@
 package com.auth.Security.user;
 
 import com.auth.Security.token.Token;
+import com.auth.Security.youtubeAccount.YoutubeAccount;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,6 +59,18 @@ public class User implements UserDetails {
             columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
     )
     private LocalDateTime created_at;
+
+    @OneToOne(
+            mappedBy = "user",
+            orphanRemoval = true, // when delete user we want to delete the youtubeAccount
+            cascade = {CascadeType.PERSIST,CascadeType.REMOVE}
+    )
+    private YoutubeAccount youtubeAccount;
+
+    public void setYoutubeAccount(YoutubeAccount youtubeAccount) {
+        this.youtubeAccount = youtubeAccount;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

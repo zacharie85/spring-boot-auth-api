@@ -7,6 +7,9 @@ import com.auth.Security.token.TokenRepository;
 import com.auth.Security.token.TokenType;
 import com.auth.Security.user.User;
 import com.auth.Security.user.UserRepository;
+import com.auth.Security.youtubeAccount.YoutubeAccount;
+import com.auth.Security.youtubeAccount.YoutubeAccountId;
+import com.auth.Security.youtubeAccount.YoutubeAccountRespository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +36,7 @@ public class AuthenticationService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
+    private  final YoutubeAccountRespository youtubeAccountRespository;
 
     public  List<UserResponse> getUsers() {
         var responses =repository.findAll();
@@ -75,6 +80,12 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
+        YoutubeAccount youtubeAccount = new YoutubeAccount(
+                new YoutubeAccountId(user.getId()),
+                user,
+                LocalDateTime.now()
+        );
+        youtubeAccountRespository.save(youtubeAccount);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
