@@ -5,7 +5,6 @@ import com.auth.Security.exeption.ApiRequestException;
 import com.auth.Security.token.Token;
 import com.auth.Security.token.TokenRepository;
 import com.auth.Security.token.TokenType;
-import com.auth.Security.user.Role;
 import com.auth.Security.user.User;
 import com.auth.Security.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,12 +12,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,24 @@ public class AuthenticationService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
+
+    public  List<UserResponse> getUsers() {
+        var responses =repository.findAll();
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        for (int i = 0; i <responses.toArray().length ; i++) {
+            userResponses.add(
+                    UserResponse.builder().first_name(responses.get(i).getFirst_name())
+                            .last_name(responses.get(i).getLast_name())
+                            .email(responses.get(i).getEmail())
+                            .role(responses.get(i).getRole())
+                            .build()
+            );
+        }
+
+      return userResponses;
+    }
+
     public AuthenticationResponse register(RegisterRequest request) {
         boolean userExists = repository
                 .findByEmail(request.getEmail())
@@ -43,7 +64,7 @@ public class AuthenticationService {
                 .last_name(request.getLastname())
                 .email((request.getEmail()))
                 .password(passwordEncoder.encode((request.getPassword())))
-                .role(Role.USER)
+                .role(request.getRole())
                 .build();
 
         var savedUser = repository.save(user);

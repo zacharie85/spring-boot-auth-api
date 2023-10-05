@@ -1,5 +1,6 @@
 package com.auth.Security.user;
 
+import com.auth.Security.token.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,12 +35,13 @@ public class User implements UserDetails {
     private  String first_name;
     private  String email;
     private  String password;
-
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
     @Enumerated(EnumType.STRING)
     private Role role;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return role.getAuthorities();
     }
 
     @Override

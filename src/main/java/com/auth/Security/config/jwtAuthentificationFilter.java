@@ -41,8 +41,11 @@ public class jwtAuthentificationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         // extra email from jwt
         userEnail = jwtService.extractUsername(jwt);
+        System.out.println("User email: " + userEnail);
+        System.out.println("User context: " +  SecurityContextHolder.getContext().getAuthentication());
         if(userEnail != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEnail);
+            System.out.println("User details: " + userDetails.getAuthorities());
             var isTokenValid = tokenRepository.findByToken(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
